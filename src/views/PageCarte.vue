@@ -1,73 +1,92 @@
 <template>
-    <div class="menu-container">
-      <div class="category" v-for="(category, index) in Object.keys(menu)" :key="index">
-        <h2>{{ category }}</h2>
-        <ul class="menu-items">
-          <li v-for="(item, index) in menu[category]" :key="index">
-            <h3>{{ item.name }}</h3>
-            <p class="description">{{ item.description }}</p>
-            <p class="price">{{ item.price }} €</p>
-          </li>
-        </ul>
+  <div class="col1">
+    <h1>Carte</h1>
+    <ul v-for="(plats, category) in groupedPlats" :key="category">
+      <h2 class="text-center">{{ category }}</h2>
+      <div v-for="plat in plats" :key="plat.name">
+        <div class="flex items-start justify-between">
+          <div class="w-2/3">
+            <strong>{{ plat.name }}</strong>
+          </div>
+          <div class="w-1/3 text-right">
+            <strong>{{ plat.price }}</strong>
+          </div>
+        </div>
+        <br>
+        <div class="text-left">{{ plat.description }}</div>
       </div>
-    </div>
-  </template>
-  
+    </ul>
+  </div>
+</template>
+
+<style>
+.text-center {
+  text-align: center;
+}
+
+.col1 {
+  width: 60%
+}
+
+.flex {
+  display: flex;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.items-start {
+  align-items: flex-start;
+}
+
+.w-2tiers {
+  width: 66.67%;
+}
+
+.w-1tiers {
+  width: 33.33%;
+}
+
+.text-right {
+  text-align: right;
+}
+.text-left {
+  text-align: left;
+}
+
+</style>
 <script>
 export default {
   data() {
     return {
-      menu: {
-        entrees: [
-          {
-            name: "Salade de chèvre chaud",
-            description: "Salade verte avec des toasts de chèvre chaud",
-            price: 8.50,
-          },
-          {
-            name: "Soupe à l'oignon",
-            description: "Soupe chaude avec des oignons caramélisés et du fromage fondu",
-            price: 7.00,
-          },
-        ],
-        viandes: [
-          {
-            name: "Entrecôte grillée",
-            description: "Entrecôte de bœuf grillée avec une sauce maison et des frites",
-            price: 19.00,
-          },
-          {
-            name: "Magret de canard",
-            description: "Magret de canard grillé avec une sauce aux figues et une purée de patates douces",
-            price: 22.00,
-          },
-        ],
-        poissons: [
-          {
-            name: "Pavé de saumon",
-            description: "Pavé de saumon grillé avec une sauce au beurre blanc et des légumes",
-            price: 18.50,
-          },
-          {
-            name: "Filet de bar",
-            description: "Filet de bar grillé avec une sauce vierge et du riz basmati",
-            price: 20.00,
-          },
-        ],
-        desserts: [
-          {
-            name: "Crème brûlée",
-            description: "Crème vanillée caramélisée",
-            price: 6.50,
-          },
-          {
-            name: "Tarte tatin",
-            description: "Tarte aux pommes renversée avec de la crème fraîche",
-            price: 7.00,
-          },
-        ],
-      },
+      plats: []
     };
   },
+  mounted() {
+    fetch('http://localhost:8000/cartes')
+      .then(response => response.json())
+      .then(data => {
+        this.plats = data;
+        console.log(this.plats);
+      })
+      .catch(error => {
+        console.error('Erreur:', error);
+      });
+  },
+  computed: {
+    groupedPlats() {
+      return this.plats.reduce((result, plat) => {
+        console.log('R: '+result + 'P: '+plat);
+        if (!result[plat.categorie]) {
+          result[plat.categorie] = [];
+        }
+        //console.log(plat.categorie);
+        result[plat.categorie].push(plat);
+        console.log(result);
+        return result;
+      }, {});
+    }
+  }
 };
 </script>
