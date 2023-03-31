@@ -1,11 +1,17 @@
 <template>
     <div class="menu">
       <h1>Menu du restaurant</h1>
-      <div class="menu-items">
-        <div v-for="(item, index) in menuItems" :key="index" class="menu-item">
-          <h2>{{ item.name }}</h2>
-          <p>{{ item.description }}</p>
-          <p>{{ item.price }}€</p>
+      <div class="menu-items text-center">
+        <div v-for="(menus, menuType) in groupedMenus" :key="menuType">
+          <h2>{{ menus[0].menuType }} - {{ menus[0].price }}</h2>
+          <div v-for="menu in menus" :key="menu.plat">
+            <h3>
+              {{ menu.cat }}
+            </h3>
+            <div>
+              {{ menu.plat }}
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -15,30 +21,34 @@
   export default {
     data() {
       return {
-        menuItems: [
-          {
-            name: "Poulet rôti",
-            description: "Un délicieux poulet rôti accompagné de légumes grillés",
-            price: 12.50,
-          },
-          {
-            name: "Burger du chef",
-            description: "Un burger fait maison avec un steak juteux et du fromage fondu",
-            price: 15.00,
-          },
-          {
-            name: "Pâtes aux crevettes",
-            description: "Des pâtes fraîches accompagnées de crevettes sautées à l'ail",
-            price: 14.00,
-          },
-          {
-            name: "Salade césar",
-            description: "Une salade fraîche avec du poulet grillé, des croûtons et du parmesan",
-            price: 10.50,
-          },
-        ],
+        menus: []
       };
     },
+
+    mounted() {
+      fetch('http://localhost:8000/menus')
+      .then(response => response.json())
+      .then(data => {
+        this.menus = data;
+        console.log(this.menus);
+      })
+      .catch(error => {
+        console.error('Erreur : ', error);
+      });
+    },
+
+    computed: {
+      groupedMenus() {
+        return this.menus.reduce((result, menu) => {
+          if (!result[menu.menuType]) {
+            result[menu.menuType]=[];
+          }
+          result[menu.menuType].push(menu);
+          return result;
+        }, {});
+      }
+
+    }
   };
   </script>
   
