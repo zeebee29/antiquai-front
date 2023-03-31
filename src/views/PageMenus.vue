@@ -3,7 +3,7 @@
       <h1>Menu du restaurant</h1>
       <div class="menu-items text-center">
         <div v-for="(menus, menuType) in groupedMenus" :key="menuType">
-          <h2>{{ menus[0].menuType }} - {{ menus[0].price }}</h2>
+          <h2>{{ menus[0].menuType }} - {{ menus[0].price }}€</h2>
           <div v-for="menu in menus" :key="menu.plat">
             <h3>
               {{ menu.cat }}
