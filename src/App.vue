@@ -1,4 +1,7 @@
+
+
 <template>
+  <div>
   <nav>
     <div class="nav-brand">
       <!--img src="chemin/vers/le/logo.png" alt="Logo du site"-->
@@ -9,8 +12,14 @@
       <li><a href="#">Le restaurant</a></li>
       <li><router-link to="/carte">Carte</router-link></li>
       <li><router-link to="/menus">Menus</router-link></li>
+      <!--li><a :href=urlInscription>S'inscrire</a></li-->
+      <li><router-link to="/login">Se connecter</router-link></li>
+      <!--li><router-link to="/inscription">S'inscrire</router-link></li-->
       <li><a href="#">Réservation</a></li>
-      <li><a href="#">Nous trouver</a></li>
+      <li><router-link v-if="this.isConnected" to="/">{{ user }}</router-link></li>
+      <li v-if="!this.isConnected"><router-link to="/login">Connexion</router-link></li>
+      <li v-if="this.isConnected"><button @click="logout">Déconnexion</button></li>
+      
     </ul>
   </nav>
   <router-view/>
@@ -21,14 +30,54 @@
       <a href="https://www.facebook.com"><i class="fab fa-facebook"></i></a>
     </div>
   </footer>
-
+</div>
 </template>
 
 <script>
+import { URL_INSCRIPTION_FRONT } from './config.js'
+import { URL_LOGIN_FRONT } from './config.js'
+import jwt_decode from 'jwt-decode';
 
 export default {
   name: 'App',
+  data() {
+    return {
+      urlInscription : URL_INSCRIPTION_FRONT,
+      urlLogin : URL_LOGIN_FRONT,
+      user: null,
+      isConnected: false
+    }
+  },
+
+  
+  mounted() {
+    this.refreshConnection()
+  },
+  methods: {
+    refreshConnection() {
+      const token = localStorage.getItem('token')
+      if (token) {
+        try {
+          const decodage = jwt_decode(token)
+          this.user = decodage.username
+          this.$router.push({ name: 'HomeQuai' })
+          this.isConnected = true
+        } catch (error) {
+          console.error(error)
+          this.$router.push({ name: 'PageLogin' })
+        }
+      } else {
+        this.user = null
+      }
+    },
+    logout() {
+      localStorage.removeItem('token')
+      this.$router.push({ name: 'HomeQuai' })
+      this.isConnected = false
+    }
+  }
 }
+
 </script>
 
 <style>

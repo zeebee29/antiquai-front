@@ -1,15 +1,15 @@
 <template>
   <div class="col1">
     <h1>Carte</h1>
-    <ul v-for="(plats, category) in groupedPlats" :key="category">
-      <h2 class="text-center">{{ category }}</h2>
-      <div v-for="plat in plats" :key="plat.name">
+    <ul v-for="(category, index) in categories" :key="index">
+      <h2 class="text-center">{{ category.title }}</h2>
+      <div v-for="(plat, index) in category.plats" :key="index">
         <div class="flex items-start justify-between">
           <div class="w-2/3">
-            <strong>{{ plat.name }}</strong>
+            <strong>{{ plat.nom }}</strong>
           </div>
           <div class="w-1/3 text-right">
-            <strong>{{ plat.price }}</strong>
+            <strong>{{ plat.prix }}</strong>
           </div>
         </div>
         <br>
@@ -56,37 +56,43 @@
 }
 
 </style>
+
 <script>
 export default {
   data() {
     return {
-      plats: []
+      plats: [],
+      categories: [],
     };
   },
   mounted() {
-    fetch('http://localhost:8000/cartes')
-      .then(response => response.json())
-      .then(data => {
-        this.plats = data;
-        console.log(this.plats);
-      })
-      .catch(error => {
-        console.error('Erreur:', error);
-      });
+    this.fetchData();
   },
-  computed: {
-    groupedPlats() {
-      return this.plats.reduce((result, plat) => {
-        console.log('R: '+result + 'P: '+plat);
-        if (!result[plat.categorie]) {
-          result[plat.categorie] = [];
+  methods: {
+    fetchData() {
+      fetch(process.env.VUE_APP_BACK_URL + '/api/plats?inCarte=true')
+        .then(response => response.json())
+        .then(data => {
+          this.plats = data['hydra:member'];
+          this.groupPlatsByCategory();
+        });
+    },
+    groupPlatsByCategory() {
+      const categories = [];
+      for (const plat of this.plats) {
+        const category = categories.find(category => category.id === plat.categorie['@id']);
+        if (category) {
+          category.plats.push(plat);
+        } else {
+          categories.push({
+            id: plat.categorie['@id'],
+            title: plat.categorie.titreCarte,
+            plats: [plat],
+          });
         }
-        //console.log(plat.categorie);
-        result[plat.categorie].push(plat);
-        console.log(result);
-        return result;
-      }, {});
-    }
-  }
+      }
+      this.categories = categories;
+    },
+  },
 };
 </script>

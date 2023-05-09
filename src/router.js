@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 //import PageMenus from '@/views/PageMenus.vue'
-import PageCarte from '@/views/PageCarte.vue'
+import PageCarte from './views/PageCarte.vue'
+import PageInscription from './views/PageInscription.vue'
+import PageLogin from './views/PageLogin.vue'
 
 
 const routes = [
@@ -18,6 +20,16 @@ const routes = [
         path: '/carte',
         name: 'PageCarte',
         component: PageCarte
+    },
+    {
+        path: '/inscription',
+        name: 'PageInscription',
+        component: PageInscription
+    },
+    {
+        path: '/login',
+        name: 'PageLogin',
+        component: PageLogin
     },
 ]
 
